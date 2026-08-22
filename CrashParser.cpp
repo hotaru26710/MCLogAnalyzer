@@ -3,19 +3,18 @@
 #include <QRegularExpression>
 
 CrashParser::CrashParser()
-    : m_hasCrash(false)
-{
+    : m_hasCrash(false){
 }
 
-void CrashParser::parse(const QString &logContent)
-{
+void CrashParser::parse(const QString &logContent){
     // 每次解析前清空旧数据
     m_errorType.clear();
     m_suggestion.clear();
     m_stackTrace.clear();
+    m_systemDetails.clear();
     m_hasCrash = false;
 
-    // 1. 检测崩溃标记
+    //检测崩溃标记
     QRegularExpression crashMarker("---- Minecraft Crash Report ----");
     QRegularExpressionMatch match = crashMarker.match(logContent);
 
@@ -25,26 +24,26 @@ void CrashParser::parse(const QString &logContent)
     }
 
     m_hasCrash = true;
-    qDebug() << "✅ 检测到崩溃报告，开始分析...";
+    qDebug() << "检测到崩溃报告，开始分析...";
 
-    // 2. 截取崩溃报告段落（从标记开始到文件末尾）
+    //截取崩溃报告段落（从标记开始到文件末尾）
     int crashStart = match.capturedStart();
     QString crashSection = logContent.mid(crashStart);
 
-    // 3. 解析
+    //解析
     parseCrashReport(crashSection);
     parseStackTrace(crashSection);
+    parseSystemDetails(crashSection);
 }
 
-void CrashParser::parseCrashReport(const QString &section)
-{
+void CrashParser::parseCrashReport(const QString &section){
     // 提取错误类型 - 找 "Description:" 行
     QRegularExpression descRe("Description:\\s*(.+)$", QRegularExpression::MultilineOption);
     QRegularExpressionMatch descMatch = descRe.match(section);
 
     if (descMatch.hasMatch()) {
         m_errorType = descMatch.captured(1).trimmed();
-        qDebug() << "📌 错误类型:" << m_errorType;
+        qDebug() << "错误类型:" << m_errorType;
     }
 
     // ========================================
@@ -79,17 +78,16 @@ void CrashParser::parseCrashReport(const QString &section)
     }
 }
 
-void CrashParser::parseStackTrace(const QString &section)
-{
+void CrashParser::parseStackTrace(const QString &section){
     // 提取堆栈 - 匹配 "at 类名(文件:行号)" 或 "at 类名(源文件)"
-    QRegularExpression stackRe("\\s+at\\s+([^(]+)\\(([^)]+)\\)");
+    QRegularExpression stackRe("(\\n|^)\\s+at\\s+([^(]+)\\(([^)]+)\\)");
     QRegularExpressionMatchIterator it = stackRe.globalMatch(section);
 
     int count = 0;
     while (it.hasNext() && count < 20) {
         QRegularExpressionMatch match = it.next();
-        QString className = match.captured(1).trimmed();
-        QString location = match.captured(2).trimmed();
+        QString className = match.captured(2).trimmed();
+        QString location = match.captured(3).trimmed();
         m_stackTrace.append(className + " (" + location + ")");
         count++;
     }
@@ -97,4 +95,116 @@ void CrashParser::parseStackTrace(const QString &section)
     if (count > 0) {
         qDebug() << "提取到" << count << "条堆栈信息";
     }
+}
+
+void CrashParser::parseSystemDetails(const QString &section)
+{
+    m_systemDetails.clear();
+
+    //找到 Details 部分
+    int detailsStart = section.lastIndexOf("Details:");
+    if (detailsStart == -1) {
+        qDebug() << "未找到 Details 部分";
+        return;
+    }
+
+    //截取 Details 后的内容
+    QString detailsSection = section.mid(detailsStart);
+
+
+    //用正则提取关键信息（只在 Details 部分查找）
+
+    //操作系统
+    QRegularExpression osRe("^\\s*Operating System:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch osMatch = osRe.match(detailsSection);
+    if (osMatch.hasMatch()) {
+        m_systemDetails["Operating System"] = osMatch.captured(1).trimmed();
+    }
+
+    //Java 版本
+    QRegularExpression javaRe("^\\s*Java Version:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch javaMatch = javaRe.match(detailsSection);
+    if (javaMatch.hasMatch()) {
+        m_systemDetails["Java Version"] = javaMatch.captured(1).trimmed();
+    }
+
+    //CPU
+    QRegularExpression cpuRe("^\\s*CPU:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch cpuMatch = cpuRe.match(detailsSection);
+    if (cpuMatch.hasMatch()) {
+        m_systemDetails["CPU"] = cpuMatch.captured(1).trimmed();
+    }
+
+    //CPU核心数
+    QRegularExpression cpusRe("^\\s*CPUs:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch cpusMatch = cpusRe.match(detailsSection);
+    if (cpusMatch.hasMatch()) {
+        m_systemDetails["CPUs"] = cpusMatch.captured(1).trimmed();
+    }
+
+    //内存
+    QRegularExpression memRe("^\\s*Memory:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch memMatch = memRe.match(detailsSection);
+    if (memMatch.hasMatch()) {
+        m_systemDetails["Memory"] = memMatch.captured(1).trimmed();
+    }
+
+    //JVM参数
+    QRegularExpression jvmRe("^\\s*JVM Flags:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch jvmMatch = jvmRe.match(detailsSection);
+    if (jvmMatch.hasMatch()) {
+        m_systemDetails["JVM Flags"] = jvmMatch.captured(1).trimmed();
+    }
+
+    //Minecraft 版本
+    QRegularExpression mcRe("^\\s*Minecraft Version:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch mcMatch = mcRe.match(detailsSection);
+    if (mcMatch.hasMatch()) {
+        m_systemDetails["Minecraft Version"] = mcMatch.captured(1).trimmed();
+    }
+
+    //启动版本
+    QRegularExpression launchRe("^\\s*Launched Version:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch launchMatch = launchRe.match(detailsSection);
+    if (launchMatch.hasMatch()) {
+        m_systemDetails["Launched Version"] = launchMatch.captured(1).trimmed();
+    }
+
+    //渲染 API
+    QRegularExpression apiRe("^\\s*Backend API:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch apiMatch = apiRe.match(detailsSection);
+    if (apiMatch.hasMatch()) {
+        m_systemDetails["Backend API"] = apiMatch.captured(1).trimmed();
+    }
+
+    //显卡
+    QRegularExpression gpuRe("^\\s*Graphics card #\\d+ name:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatchIterator gpuIt = gpuRe.globalMatch(detailsSection);
+    while (gpuIt.hasNext()) {
+        QRegularExpressionMatch gpuMatch = gpuIt.next();
+        QString gpuName = gpuMatch.captured(1).trimmed();
+        // 过滤掉虚拟显卡
+        if (!gpuName.contains("Oray", Qt::CaseInsensitive)) {
+            m_systemDetails["Graphics Card"] = gpuName;
+            break;//只取第一个真实显卡
+        }
+    }
+
+    //模组加载器
+    QRegularExpression moddedRe("^\\s*Is Modded:\\s*(.+)$", QRegularExpression::MultilineOption);
+    QRegularExpressionMatch moddedMatch = moddedRe.match(detailsSection);
+    if (moddedMatch.hasMatch()) {
+        QString moddedInfo = moddedMatch.captured(1).trimmed();
+        if (moddedInfo.contains("forge", Qt::CaseInsensitive)) {
+            m_systemDetails["Mod Loader"] = "Forge";
+        } else if (moddedInfo.contains("fabric", Qt::CaseInsensitive)) {
+            m_systemDetails["Mod Loader"] = "Fabric";
+        } else if (moddedInfo.contains("Definitely")) {
+            m_systemDetails["Mod Loader"] = "Forge/Fabric (已检测到)";
+        } else {
+            m_systemDetails["Mod Loader"] = moddedInfo;
+        }
+    }
+
+    qDebug() << "提取到" << m_systemDetails.size() << "条系统信息";
 }

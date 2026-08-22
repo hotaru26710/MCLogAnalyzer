@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>569</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,31 +58,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QTreeWidget" name="resultTree">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>180</y>
-      <width>801</width>
-      <height>231</height>
-     </rect>
-    </property>
-    <column>
-     <property name="text">
-      <string>项目</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>内容</string>
-     </property>
-    </column>
-   </widget>
    <widget class="QPushButton" name="analyzeBtn">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>510</y>
+      <x>690</x>
+      <y>500</y>
       <width>80</width>
       <height>23</height>
      </rect>
@@ -95,7 +75,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>410</y>
+      <y>430</y>
       <width>801</width>
       <height>23</height>
      </rect>
@@ -103,6 +83,74 @@
     <property name="value">
      <number>24</number>
     </property>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>180</y>
+      <width>801</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="solution">
+     <attribute name="title">
+      <string>Tab 1</string>
+     </attribute>
+     <widget class="QTreeWidget" name="resultTree">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>841</width>
+        <height>221</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>项目</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>内容</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="details">
+     <attribute name="title">
+      <string>Tab 2</string>
+     </attribute>
+     <widget class="QTreeWidget" name="detailsTree">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>801</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>项目</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>内容</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string/>
+       </property>
+      </column>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

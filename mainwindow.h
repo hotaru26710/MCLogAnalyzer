@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,6 +33,6 @@ private:
     CrashParser m_parser;
 
     void showResult(const QString &errorType, const QString &suggestion, const QStringList &stack);
-
+    void showSystemInfo(const QMap<QString,QString> &sysInfo);
 };
 #endif // MAINWINDOW_H
