@@ -27,10 +27,16 @@ private slots:
 
     void on_analyzeBtn_clicked();
 
+    void on_themeToggle_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString m_currentFilePath;
     CrashParser m_parser;
+
+    // 外观：深浅主题（不影响任何分析逻辑）
+    bool m_dark = false;
+    void applyTheme();
 
     void showResult(const QString &errorType, const QString &suggestion, const QStringList &stack);
     void showSystemInfo(const QMap<QString,QString> &sysInfo);

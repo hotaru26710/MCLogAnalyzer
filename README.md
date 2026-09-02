@@ -1,2 +1,100 @@
-# MCLogAnalyzer
-Minecraft crash detection service – parses game crash logs, identifies root cause, and provides corresponding fix solutions.
+# MCLogAnalyzer · Minecraft 日志分析器
+
+一个基于 Qt 6 (C++17) 的桌面小工具：把一份 **Minecraft 崩溃报告**丢进来，几秒内帮你揪出**是谁惹的祸**，并给出对应的修复方向。
+
+再也不用对着密密麻麻的 `at net.minecraft.xxx` 堆栈发呆了——这个工具负责把锅认到**具体模组**头上。
+
+---
+
+## ✨ 主要功能
+
+### 🎯 肇事模组识别（核心亮点）
+
+这是工具最花功夫的地方。它会跨版本、跨加载器地尝试定位**真正引发异常的责任模组**，采用多级证据链条：
+
+| 定位手段 | 说明 | 可靠性 |
+|---|---|---|
+| **消息点名** | 报告里直接写 `Caught exception from XXX (modid)`、`The mod X has failed` | ⭐⭐⭐ 最高 |
+| **实体锚点** | `Ticking entity` 报告给出 `Entity Type: alexsmobs:crocodile`，反推命名空间 | ⭐⭐⭐ |
+| **堆栈 jar 反查** | 逐帧读 `~[xxx.jar]`，跳过 minecraft/forge/mixin 等平台帧，锁定第一个第三方源码帧 | ⭐⭐ |
+| **事件监听壳剔除** | 自动忽略 `*Events`/`*Listener`/`lambda$` 这类"过路"回调帧，避免误指中间人 | ⭐⭐ |
+| **父子构造链归因** | 构造栈里父构造函数报错时，把责任归给真正发起构造的子类模组 | ⭐⭐ |
+| **Suspected 保底** | 上面全查不到时，采纳报告自带的 `Suspected Mods:` 字段 | ⭐⭐ 最终兜底 |
+
+- 识别结果含模组 **id / 显示名 / 版本**，并附上**命中证据**（原始堆栈帧 / 点名文本），可信可查。
+- 找不到模组时会如实说"可能是原版或引擎自身问题"，**绝不瞎指认**。
+
+### 🧠 崩溃根因与修复建议
+
+- 解析 `Description:` 定位错误类型；
+- 内置大量规则匹配（OOM、模组冲突、空指针、JVM/渲染崩溃、实体/区块 Ticking Exception 等），给出可执行的修复提示；
+- 无法判定时提示去社区检索，不自作聪明。
+
+### 🧾 环境与堆栈解析
+
+- 提取 **堆栈跟踪**（前 20 条），一眼看到出错现场；
+- 抽取 **System Details**：操作系统、Java 版本、CPU / 内存、JVM 参数、Minecraft 版本、渲染 API、显卡（自动滤掉虚拟显卡）、模组加载器(Forge/Fabric)；
+- 解析 **Mod List**，列出当前已加载的模组清单。
+
+### 🎨 清爽界面
+
+- 弹性布局，窗口随意缩放控件自适应；
+- **浅色 / 深色**主题一键切换；
+- 结果树高亮配色（错误红 / 方案蓝 / 模组橙），状态栏实时提示；系统信息按重要度排序。
+
+---
+
+## 🚀 如何使用
+
+1. **浏览文件**：选择 `crash-reports/` 下的 `.txt`/`.log`（可直接选 `report-*.txt`），界面会先预览前 200 行；
+2. 点 **开始** 运行分析；  
+　 顶栏可随时切换 🌙 深浅主题；
+3. 在 **分析结果** 页签看结论：
+   - 🎯 **主要责任模组**（可展开看命中证据）
+   - 错误类型 → 💡 解决方案 → 📍 堆栈跟踪
+   在 **系统信息** 页签看环境与 📦 模组清单。
+
+---
+
+## ⚙️ 工作原理（分析链路）
+
+`CrashParser` 对整份崩溃报告做**有优先级**的判定，而非简单字符串匹配：
+
+1. 寻找 `---- Minecraft Crash Report ----` 标记，确定是否发生崩溃；
+2. 提取错误类型与错误触发上下文；
+3. 解析 `Details:`→系统信息、`Mod List:`/`Mods:`→已加载模组；
+4. **识别主要责任模组**：消息点名 → 实体锚点 → 堆栈 jar 反查(过滤平台 jar 与事件壳帧) → 构造链归因 → `Suspected Mods` 字段保底；
+5. 合并为树状结果返回给界面。
+
+> 细节点（踩过的坑）：
+> - 客户端合并 jar 名形如 `client-...-srg.jar%23628!/:?`——内部 `%…!/` 路径不能当目录分隔，须先截到 `.jar` 再取文件名，否则整个帧会被误判为"非模组帧"而漏掉。
+> - 帧来源可能是 `mods` 子路径、`%id!/` 合并 jar 或版本尾巴，归一化后才好反查。
+
+---
+
+## 🧱 技术栈
+
+- **Qt 6 Widgets**（GUI）+ **C++17**
+- **QRegularExpression** 处理崩溃报告的各种分隔结构
+- 全部分析逻辑集中在 `CrashParser`，与 UI 解耦，可独立复用/做 CLI/AI 增强
+
+## 📁 文件结构
+
+```
+MCLogAnalyzer/
+├── main.cpp            # 程序入口
+├── mainwindow.{h,cpp}  # 主窗口：文件选择、分析触发、结果树、深浅主题
+├── mainwindow.ui        # 界面布局
+├── CrashParser.{h,cpp}  # 核心引擎：解析 + 责任模组识别(可复用)
+├── resources.qrc        # 打包主题
+├── theme-light.qss      # 浅色主题
+└── theme-dark.qss       # 深色主题
+```
+
+## 🧪 一处如实交代
+
+仓库里的 `dsh-dump-alpha.txt` 并非 Minecraft 崩溃日志，而是一份无关该项目的系统配置文件 dump，可安全删除，避免与真实 `.log` 混淆。
+
+---
+
+> **授权 / License**：见 [LICENSE](LICENSE)。

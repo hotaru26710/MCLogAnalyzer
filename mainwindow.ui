@@ -6,168 +6,197 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>569</height>
+    <width>880</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Minecraft 日志分析器</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="openBtn">
-    <property name="geometry">
-     <rect>
-      <x>720</x>
-      <y>20</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
+   <layout class="QVBoxLayout" name="rootLayout">
+    <property name="spacing">
+     <number>10</number>
     </property>
-    <property name="text">
-     <string>浏览</string>
+    <property name="leftMargin">
+     <number>18</number>
     </property>
-   </widget>
-   <widget class="QLabel" name="fileLabel">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>721</width>
-      <height>61</height>
-     </rect>
+    <property name="topMargin">
+     <number>16</number>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
+    <property name="rightMargin">
+     <number>18</number>
     </property>
-    <property name="text">
-     <string>文件路径：</string>
+    <property name="bottomMargin">
+     <number>16</number>
     </property>
-   </widget>
-   <widget class="QTextEdit" name="logPreview">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>60</y>
-      <width>801</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="analyzeBtn">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>500</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>开始</string>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>430</y>
-      <width>801</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>24</number>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>180</y>
-      <width>801</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>1</number>
-    </property>
-    <widget class="QWidget" name="solution">
-     <attribute name="title">
-      <string>Tab 1</string>
-     </attribute>
-     <widget class="QTreeWidget" name="resultTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>841</width>
-        <height>221</height>
-       </rect>
+    <item>
+     <layout class="QHBoxLayout" name="fileRow">
+      <item>
+       <widget class="QLabel" name="fileLabel">
+        <property name="text">
+         <string>选择一个 Minecraft 日志文件</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="fileSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="themeToggle">
+        <property name="text">
+         <string>深色模式</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="openBtn">
+        <property name="text">
+         <string>浏览文件…</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="logPreview">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>120</height>
+       </size>
       </property>
-      <column>
-       <property name="text">
-        <string>项目</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>内容</string>
-       </property>
-      </column>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="details">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
-     <widget class="QTreeWidget" name="detailsTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>801</width>
-        <height>231</height>
-       </rect>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>170</height>
+       </size>
       </property>
-      <column>
-       <property name="text">
-        <string>项目</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>内容</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string/>
-       </property>
-      </column>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="placeholderText">
+       <string>导入日志文件后，这里会显示文件预览…</string>
+      </property>
      </widget>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuMinecraft">
-    <property name="title">
-     <string>Minecraft日志分析器</string>
-    </property>
-   </widget>
-   <addaction name="menuMinecraft"/>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="solution">
+       <attribute name="title">
+        <string>分析结果</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="solutionLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="resultTree">
+          <column>
+           <property name="text">
+            <string>项目</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>内容</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="details">
+       <attribute name="title">
+        <string>系统信息</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="detailsLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="detailsTree">
+          <column>
+           <property name="text">
+            <string>项目</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>内容</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="bottomRow">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="analyzeBtn">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>112</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>开始</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
