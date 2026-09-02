@@ -95,6 +95,10 @@ MCLogAnalyzer/
 
 仓库里的 `dsh-dump-alpha.txt` 并非 Minecraft 崩溃日志，而是一份无关该项目的系统配置文件 dump，可安全删除，避免与真实 `.log` 混淆。
 
+## 声明
+
+本程序测试文件大部分由AI抓取，可能出现识别字段不匹配导致无法检测出真实原因，如有未知错误，可告知开发者修改
+
 ---
 
 > **授权 / License**：见 [LICENSE](LICENSE)。
